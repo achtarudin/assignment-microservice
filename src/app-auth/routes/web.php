@@ -22,8 +22,3 @@ $router->post('/login', 'Auth\AuthController@login');
 $router->post('/registration', 'Auth\AuthController@registration');
 
 $router->post('/logout', 'Auth\AuthController@logout');
-
-
-
-
-

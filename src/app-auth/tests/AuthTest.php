@@ -17,7 +17,8 @@ class AuthTest extends TestCase
         $this->post('login');
 
         $this->assertEquals(
-            'login', $this->response->getContent()
+            'login',
+            $this->response->getContent()
         );
     }
 

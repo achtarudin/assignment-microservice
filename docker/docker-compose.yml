@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
 
@@ -13,7 +13,7 @@ services:
     volumes:
       - ../src:/var/www
     networks:
-      - backend
+      - microservices
 
   # nginx service
   nginx:
@@ -25,10 +25,12 @@ services:
       - 4430:443
     volumes:
       - ../src:/var/www
-      - ./nginx:/etc/nginx/conf.d 
+      - ./nginx:/etc/nginx/conf.d
     networks:
-      - backend
+      - microservices
     working_dir: /var/www
 
 networks:
-  backend:
+  microservices:
+    external:
+      name: laradock_backend
