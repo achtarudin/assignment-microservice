@@ -2,12 +2,14 @@
 
 namespace App\Exceptions;
 
+use Throwable;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Throwable;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -49,6 +51,27 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof MethodNotAllowedHttpException) {
+
+            return response()->json(['message' => 'Method Not Allowed', 'code' => $exception->getStatusCode()], $exception->getStatusCode());
+        }
+
+        if ($exception instanceof HttpException) {
+
+            return response()->json(['message' => $exception->getMessage(), 'code' => $exception->getStatusCode()], $exception->getStatusCode());
+        }
+
+        if ($exception instanceof QueryException) {
+
+            $statusCode = method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500;
+        return response()->json(['message' => 'Unexpected  Error QueryException', 'code' => $statusCode], $statusCode);
+        }
+
+        // dd($exception);
+        // $statusCode = method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500;
+
+        // return response()->json(['message' => $exception->getMessage(), 'code' => $statusCode], $statusCode);
+
         return parent::render($request, $exception);
     }
 }
