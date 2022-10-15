@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  # app auth
+  app_auth:
+    build:
+      context: .
+      dockerfile: ./docker/php-fpm/Dockerfile
+    container_name: app-auth
+    restart: always
+    volumes:
+      - ./src/app-auth:/var/www/app-auth 
+    networks:
+      - microservices
+    working_dir: /var/www/app-auth
+
+  # server auth
+  server_auth:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: server-auth
+    restart: always
+    ports:
+      - 8000:80
+    volumes:
+      - ./src/app-auth:/var/www/app-auth
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - microservices
+    working_dir: /var/www
+
+  # server blog
+  server_blog:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: server-blog
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./src/app-blog:/var/www/app-blog
+      - ./docker/nginx/blog.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - microservices
+    working_dir: /var/www
+
+  # app blog
+  app_blog:
+    build:
+      context: .
+      dockerfile: ./docker/php-fpm/Dockerfile
+    container_name: app-blog
+    restart: always
+    volumes:
+      - ./src/app-blog:/var/www/app-blog 
+    networks:
+      - microservices
+    working_dir: /var/www/app-blog
+
+networks:
+  microservices:
+    external:
+      name: laradock_backend
