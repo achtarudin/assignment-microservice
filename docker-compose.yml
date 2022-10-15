@@ -14,6 +14,7 @@ services:
     networks:
       - microservices
     working_dir: /var/www/app-auth
+    env_file: docker.env
 
   # server auth
   server_auth:
@@ -59,8 +60,42 @@ services:
     networks:
       - microservices
     working_dir: /var/www/app-blog
+    env_file: docker.env
+  
+  # mysql database
+  mysql_app:
+    image: mysql:5.7.32
+    container_name: app-database
+    restart: on-failure
+    # environment:
+    #   - MYSQL_USER=root
+    #   - MYSQL_ROOT_PASSWORD=secret
+    #   - MYSQL_PASSWORD=secret
+    volumes:
+      - microservices_db:/var/lib/mysql
+    networks:
+      - microservices
+    env_file: docker.env
+    
+  # phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: app-phpmyadmin
+    restart: on-failure
+    # environment:
+    #   - PMA_HOST=mysql_app
+    ports:
+      - 9090:80
+    networks:
+      - microservices
+    depends_on:
+      - mysql_app
+    env_file: docker.env
 
 networks:
   microservices:
     external:
       name: laradock_backend
+
+volumes:
+  microservices_db:
