@@ -5,6 +5,7 @@ $actionUrl = Route::is('blogs.create') ? route('blogs.store') : route('blogs.upd
 
 $valueTitle = old('title') ? old('title') : (isset($result->title) ? $result->title : '');
 $valueContent = old('content') ? old('content') : (isset($result->content) ? $result->content : '');
+$btnName = Route::is('blogs.create') ? 'Create' : 'Update';
 
 @endphp
 @section('contents')
@@ -19,13 +20,16 @@ $valueContent = old('content') ? old('content') : (isset($result->content) ? $re
         </div>
 
         <form action="{{ $actionUrl }}" method="post">
+            @isset($result)
+                @method('PUT')
+            @endisset
             @csrf
             <div class="d-flex justify-content-between mb-4">
                 <div>
                     {{ $errors }}
                     {{ old('tags.0') }}
                 </div>
-                <button type="submit" class="btn btn-lg btn-info">Save</button>
+                <button type="submit" class="btn btn-lg btn-info">{{$btnName}}</button>
             </div>
             <div class="row">
                 <div class="col-md-8">
@@ -48,15 +52,15 @@ $valueContent = old('content') ? old('content') : (isset($result->content) ? $re
                                 <div class="row">
                                     @foreach ($tagChunk as $keyTag => $tag)
                                         <div class="col-md-6">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="{{ $tag->id }}"
-                                                    name="tags[{{ $keyTag }}]"
-                                                    @if (old("tags.{$keyTag}") == $tag->id) checked @endif>
-                                                <label class="form-check-label" for="flexCheckDefault">
-                                                    {{ $tag->name }} {{ old("tags.{$keyTag}") }}
-                                                </label>
-                                            </div>
-
+                                            @include('components.checkbox', [
+                                                'id'        => "tag-{$keyTag}",
+                                                'value'     => $tag->id,
+                                                'name'      => "tags[{$keyTag}]",
+                                                'label'     => $tag->name . old("tags.{$keyTag}"),
+                                                'isCheck'   => old("tags.{$keyTag}") && old("tags.{$keyTag}") == $tag->id
+                                                    ? true
+                                                    : (isset($result) && $result->tag_details->contains('detailable_id', $tag->id) && $errors->isEmpty() ? true : false)
+                                            ])
                                         </div>
                                     @endforeach
                                 </div>
@@ -68,15 +72,16 @@ $valueContent = old('content') ? old('content') : (isset($result->content) ? $re
                                 <div class="row">
                                     @foreach ($categoryChunk as $keyCategory => $category)
                                         <div class="col-md-6">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="{{ $category->id }}"
-                                                    name="categories[{{ $keyCategory }}]"
-                                                    @if (old("categories.{$keyCategory}") == $category->id) checked @endif>
-                                                <label class="form-check-label" for="flexCheckDefault">
-                                                    {{ $category->name }} {{ old("categories.{$keyCategory}") }}
-                                                </label>
-                                            </div>
 
+                                            @include('components.checkbox', [
+                                                'id'        => "category-{$keyCategory}",
+                                                'value'     => $category->id,
+                                                'name'      => "categories[{$keyCategory}]",
+                                                'label'     => $category->name . old("categories.{$keyCategory}"),
+                                                'isCheck'   => old("categories.{$keyCategory}") && old("categories.{$keyCategory}") == $category->id
+                                                    ? true
+                                                    : (isset($result) && $result->category_details->contains('detailable_id', $category->id) ? true : false)
+                                            ])
                                         </div>
                                     @endforeach
                                 </div>

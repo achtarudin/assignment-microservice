@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Blog;
 use Illuminate\Http\Request;
 use App\Services\Blog\BlogService;
 use App\Http\Controllers\Controller;
+use App\Models\Models\Blog\TagModel;
+use App\Models\Models\Blog\CategoryModel;
 use App\Http\Requests\Blog\BlogCreateRequest;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -36,12 +38,21 @@ class BlogController extends Controller
     {
         $valid = $request->validated();
         $result = $this->blogService->storeData($valid);
-        dd(request()->all(), $valid);
+        return redirect()->route('blogs.show', $result->id);
     }
 
     public function show($id)
     {
-        $result =  $this->blogService->findBy(['id' => $id])->first();
+        $result =  $this->blogService->findBy(['id' => $id])->with([
+            'category_details.category:id,name',
+            'tag_details.tag:id,name',
+            'category_details' => function ($query) {
+                $query->where('detailable_type', CategoryModel::class);
+            },
+            'tag_details' => function ($query) {
+                $query->where('detailable_type', TagModel::class);
+            },
+        ])->first();
 
         throw_if(!$result, new HttpException(404, 'Blog not found'));
 
@@ -50,12 +61,36 @@ class BlogController extends Controller
 
     public function edit($id)
     {
-        //
+        $dependencies =  $this->blogService->getDependencies();
+
+        $result =  $this->blogService->findBy(['id' => $id])->with([
+            'tag_details.tag:id,name',
+            'category_details.category:id,name',
+            'category_details' => function ($query) {
+                $query->where('detailable_type', CategoryModel::class);
+            },
+            'tag_details' => function ($query) {
+                $query->where('detailable_type', TagModel::class);
+            },
+        ])->first();
+
+        throw_if(!$result, new HttpException(404, 'Blog not found'));
+
+        // return $result;
+        return view('blog.blog', compact('dependencies', 'result'));
     }
 
-    public function update(Request $request, $id)
+    public function update(BlogCreateRequest $request, $id)
     {
-        //
+        $valid = $request->validated();
+
+        $result =  $this->blogService->findBy(['id' => $id])->with(['category_details', 'tag_details'])->first();
+
+        throw_if(!$result, new HttpException(404, 'Blog not found'));
+
+        $resultUpdate = $this->blogService->updateData($result, $valid);
+
+        return redirect()->route('blogs.edit', $resultUpdate->id);
     }
 
     public function destroy($id)

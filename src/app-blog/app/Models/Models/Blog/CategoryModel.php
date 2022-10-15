@@ -20,6 +20,7 @@ class CategoryModel extends Model
      */
     public $timestamps = false;
 
+    protected $guarded = [];
     /**
      * The Factory that should be used when creating new models
      */

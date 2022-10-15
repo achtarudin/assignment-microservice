@@ -2,11 +2,11 @@
 
 namespace App\Models\Models\Blog;
 
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Models\Blog\TagModel;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\Blog\BlogFactory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BlogModel extends Model
@@ -32,6 +32,19 @@ class BlogModel extends Model
     }
 
     /**
+     * Define The Getters
+     */
+    public function getCreatedAtForHumanAttribute()
+    {
+        return $this->created_at ? Carbon::parse($this->created_at)->diffForHumans() : null;
+    }
+
+    public function getUpdatedAtForHumanAttribute()
+    {
+        return $this->updated_at ? Carbon::parse($this->updated_at)->diffForHumans() : null;
+    }
+
+    /**
      * Define belongsTo relationship
      */
     public function author()
@@ -40,14 +53,20 @@ class BlogModel extends Model
     }
 
     /**
-     * Difine The Getters
+     * Define hasMany relationship
      */
-    public function getCreatedAtForHumanAttribute(){
-        return $this->created_at ? Carbon::parse($this->created_at)->diffForHumans() : null;
+    public function content_details()
+    {
+        return $this->hasMany(ContentDetailModel::class, 'content_id');
     }
 
-    public function getUpdatedAtForHumanAttribute()
+    public function tag_details()
     {
-        return $this->updated_at ? Carbon::parse($this->updated_at)->diffForHumans() : null;
+        return $this->hasMany(ContentDetailModel::class, 'content_id');
+    }
+
+    public function category_details()
+    {
+        return $this->hasMany(ContentDetailModel::class, 'content_id');
     }
 }

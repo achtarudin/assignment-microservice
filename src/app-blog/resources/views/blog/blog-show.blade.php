@@ -9,6 +9,9 @@
                 <div class="align-self-center text-center flex-grow-1">
                     <h2>{{ $result->title }}</h2>
                 </div>
+                 <div class="me-3">
+                    <a href="{{ route('blogs.edit', $result->id) }}" class="btn btn-info btn-sm">Edit</a>
+                </div>
             </div>
         </div>
 
@@ -18,11 +21,11 @@
             <div class="d-flex justify-content-between">
                 <div class="align-self-start">
                     <div>
-                        Tags: {{collect(['tag1', 'tag2', 'tag3'])->implode(', ')}}
+                        Tags: {{ $result->tag_details->pluck('tag')->pluck('name')->implode(', ') }}
                     </div>
 
                     <div>
-                        Category: {{collect(['Category1', 'Category2'])->implode(', ')}}
+                        Category: {{ $result->tag_details->pluck('category')->pluck('name')->implode(', ') }}
                     </div>
                 </div>
                 <div>
