@@ -19,15 +19,15 @@ class BlogSeeder extends Seeder
     public function run()
     {
         TagModel::factory()
-            ->count(10)
+            ->count(5)
             ->create();
 
         CategoryModel::factory()
-            ->count(10)
+            ->count(5)
             ->create();
 
         BlogModel::factory()
-            ->count(50)
+            ->count(5)
             ->sequence(function () {
                 return [
                     'created_by' => User::inRandomOrder()->first()->id,

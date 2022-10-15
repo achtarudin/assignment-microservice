@@ -3,8 +3,10 @@
 namespace App\Models\Models\Blog;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\Blog\BlogFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BlogModel extends Model
@@ -32,8 +34,20 @@ class BlogModel extends Model
     /**
      * Define belongsTo relationship
      */
-    public function created_by_user()
+    public function author()
     {
-        return $this->belongsTo(User::class, 'created_by', 'id');
+        return $this->belongsTo(User::class, 'created_by', 'id')->withDefault();
+    }
+
+    /**
+     * Difine The Getters
+     */
+    public function getCreatedAtForHumanAttribute(){
+        return $this->created_at ? Carbon::parse($this->created_at)->diffForHumans() : null;
+    }
+
+    public function getUpdatedAtForHumanAttribute()
+    {
+        return $this->updated_at ? Carbon::parse($this->updated_at)->diffForHumans() : null;
     }
 }
