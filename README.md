@@ -28,6 +28,8 @@
   - URL `http://localhost:8000/token-check`
   - header  `{ Barrer token}`
   
+> If this project have errors feel free to contact me or using github issues
+
 #### Task list
 - [x] Auth API service
 - [x] CRUD Blog & Blog service
@@ -47,4 +49,3 @@
    - there are a tons package for laravel, I just use packages base on the project requirements
 2.  VS Code, Poppular and large community
 
-> I guess it is enough, Enjoy
