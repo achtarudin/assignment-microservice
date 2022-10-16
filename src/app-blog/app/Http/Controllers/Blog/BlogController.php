@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Blog;
 
-use Illuminate\Http\Request;
 use App\Services\Blog\BlogService;
 use App\Http\Controllers\Controller;
 use App\Models\Models\Blog\TagModel;
@@ -17,6 +16,7 @@ class BlogController extends Controller
     public function __construct(BlogService $blogService)
     {
         $this->blogService = $blogService;
+        $this->middleware('microservice.auth')->except(['index', 'show']);
     }
 
     public function index()
@@ -38,7 +38,7 @@ class BlogController extends Controller
     {
         $valid = $request->validated();
         $result = $this->blogService->storeData($valid);
-        return redirect()->route('blogs.show', $result->id);
+        return redirect()->route('blogs.show', $result->id)->with('success', "Blog {$result->title} Created successfully ");
     }
 
     public function show($id)
@@ -62,21 +62,24 @@ class BlogController extends Controller
     public function edit($id)
     {
         $dependencies =  $this->blogService->getDependencies();
-
-        $result =  $this->blogService->findBy(['id' => $id])->with([
-            'tag_details.tag:id,name',
-            'category_details.category:id,name',
-            'category_details' => function ($query) {
-                $query->where('detailable_type', CategoryModel::class);
-            },
-            'tag_details' => function ($query) {
-                $query->where('detailable_type', TagModel::class);
-            },
-        ])->first();
+        $result =  $this->blogService->findBy([
+            'id' => $id,
+            'created_by' => auth()->user()->id
+        ])
+            ->with([
+                'tag_details.tag:id,name',
+                'category_details.category:id,name',
+                'category_details' => function ($query) {
+                    $query->where('detailable_type', CategoryModel::class);
+                },
+                'tag_details' => function ($query) {
+                    $query->where('detailable_type', TagModel::class);
+                },
+            ])
+            ->first();
 
         throw_if(!$result, new HttpException(404, 'Blog not found'));
 
-        // return $result;
         return view('blog.blog', compact('dependencies', 'result'));
     }
 
@@ -84,17 +87,34 @@ class BlogController extends Controller
     {
         $valid = $request->validated();
 
-        $result =  $this->blogService->findBy(['id' => $id])->with(['category_details', 'tag_details'])->first();
+        $result =  $this->blogService->findBy([
+            'id' => $id,
+            'created_by' => auth()->user()->id
+        ])
+            ->with(['category_details', 'tag_details'])
+            ->first();
 
         throw_if(!$result, new HttpException(404, 'Blog not found'));
 
         $resultUpdate = $this->blogService->updateData($result, $valid);
 
-        return redirect()->route('blogs.edit', $resultUpdate->id);
+        return redirect()->route('blogs.edit', $resultUpdate->id)->with('success', "Blog {$resultUpdate->title} update successfully ");
     }
 
     public function destroy($id)
     {
-        //
+        $result =  $this->blogService->findBy([
+            'id' => $id,
+            'created_by' => auth()->user()->id
+        ])
+            ->with(['category_details', 'tag_details'])
+            ->first();
+
+        throw_if(!$result, new HttpException(404, 'Blog not found'));
+
+        $result->delete();
+
+        return redirect()->route('blogs.index')->with('success', "Blog {$result->title} deleted successfully ");
+
     }
 }

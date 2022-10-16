@@ -19,6 +19,7 @@
         </div>
 
         @includeWhen(!$errors->isEmpty(), 'components.alert-error')
+        @includeWhen(session()->has('success') , 'components.alert-success')
 
         <form action="{{ $actionUrl }}" method="post" autocomplete="off">
             @isset($result)

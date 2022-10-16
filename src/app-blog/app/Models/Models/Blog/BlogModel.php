@@ -4,14 +4,14 @@ namespace App\Models\Models\Blog;
 
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Models\Blog\TagModel;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\Blog\BlogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BlogModel extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table name

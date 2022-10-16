@@ -13,6 +13,7 @@ class MicroserviceMiddleware
     {
         $serverAuth     = config('microservice.server_auth');
         $cookieHangus   = config('microservice.cookie_name');
+
         throw_if(!$serverAuth || !$cookieHangus, new MicroserviceException(500, 'Server auth not found'));
         $request->merge([
             'serverAuth'    => $serverAuth,

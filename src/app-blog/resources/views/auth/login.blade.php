@@ -39,6 +39,8 @@
                     <div class="d-flex justify-content-between mt-2">
                         <div class="align-self-center">
                             <a href="{{route('registration')}}" class="text-info">Registration</a>
+                            |
+                            <a href="{{route('blogs.index')}}" class="text-info">blogs</a>
                         </div>
                         <button type="submit" class="btn btn-lg btn-info">{{$btnName}}</button>
                     </div>

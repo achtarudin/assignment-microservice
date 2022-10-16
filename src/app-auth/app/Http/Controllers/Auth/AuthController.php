@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\User;
-use App\Models\UserJwtModel;
 use Illuminate\Http\Request;
 use App\Services\Auth\AuthService;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthController extends Controller
@@ -88,10 +87,25 @@ class AuthController extends Controller
         try {
             $getToken   = JWTAuth::getToken();
             $apy        = JWTAuth::getPayload($getToken)->toArray();
-            return response()->json(true, 200);
+            $user       = $this->authService->findRecordBy(['id' => $apy['id']])->first();
 
+            throw_if(!$user, new TokenInvalidException('Unauthorized', 401));
+
+            $newToken = JWTAuth::fromUser($user);
+
+            return response()->json([
+                'user'          => $user->only('id', 'email', 'name'),
+                'refresh_token' => [
+                    'access_token'  => $newToken,
+                    'token_type'    => 'Bearer',
+                    'expires_in'    =>  Carbon::now()->timestamp + config('jwt.ttl') * 60,
+                    'ttl'           =>  config('jwt.ttl'),
+                ],
+            ], 200, [
+                'Content-Type' => 'application/json',
+            ]);
         } catch (Exception $e) {
-            throw($e);
+            throw ($e);
         }
     }
 }

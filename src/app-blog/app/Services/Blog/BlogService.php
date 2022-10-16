@@ -22,16 +22,26 @@ class BlogService implements BlogInterface
         $this->blogModel = $blogModel;
     }
 
+    /**
+     * @param array $filter
+     * @return Builder
+     * Get all blogs
+     */
     public function findBy(array $filter = []): Builder
     {
         return $this->blogModel->where($filter);
     }
 
+    /**
+     * @param array $attributes
+     * @return Model
+     * Store your blog
+     */
     public function storeData(array $attributes): Model
     {
         DB::beginTransaction();
         try {
-            $userId = 1;
+            $userId = auth()->user()->id;
 
             // filter the attributes for blog
             $blogAttribute = collect($attributes)->except(['tags', 'categories'])->toArray();
@@ -78,11 +88,15 @@ class BlogService implements BlogInterface
         }
     }
 
+    /**
+     * @param array $attributes
+     * @return Model
+     * Update your blog
+     */
     public function updateData($model, array $attributes): Model
     {
         DB::beginTransaction();
         try {
-            $userId = 1;
             $blogAttribute = collect($attributes)->except(['tags', 'categories'])->toArray();
 
             $this->blogModel = $model;

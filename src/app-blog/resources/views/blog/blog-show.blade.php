@@ -10,11 +10,21 @@
                 <div class="align-self-center text-center flex-grow-1">
                     <h2>{{ $result->title }}</h2>
                 </div>
-                 <div class="me-3">
-                    <a href="{{ route('blogs.edit', $result->id) }}" class="btn btn-info btn-sm">Edit</a>
-                </div>
+                @if (auth()->check() && auth()->user()->id == $result->created_by)
+                    <div class="me-3">
+                        <a href="{{ route('blogs.edit', $result->id) }}" class="btn btn-info btn-sm">Edit</a>
+                    </div>
+                     <form action="{{ route('blogs.destroy', $result->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                @endif
+
             </div>
         </div>
+
+        @includeWhen(session()->has('success') , 'components.alert-success')
 
         {{-- Content --}}
         <div class="card border-0 shadow-sm p-3">

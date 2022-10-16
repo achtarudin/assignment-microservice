@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cookie;
 use App\Http\Requests\Auth\BlogLoginRequest;
 use App\Http\Requests\Auth\BlogRegistrationRequest;
 
@@ -45,5 +45,11 @@ class BlogAuthController extends Controller
             return redirect()->route('login')->with('success', 'Registration success');
         }
         return redirect()->back()->withInput()->withErrors($response->json());
+    }
+
+    public function logout()
+    {
+        Cookie::queue(Cookie::forget(request()->cookieHangus));
+        return redirect()->route('blogs.index');
     }
 }

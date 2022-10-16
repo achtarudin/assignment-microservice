@@ -17,20 +17,34 @@ Route::get('/', function () {
     return redirect()->route('blogs.index');
 });
 
-Route::namespace('App\Http\Controllers\Blog')->group(function () {
-    Route::resource('blogs', 'BlogController');
-    Route::resource('categories', 'CategoryController');
-    Route::resource('tags', 'TagController');
-});
+Route::middleware('microservice')->group(function () {
 
-Route::namespace('App\Http\Controllers\Auth')->group(function () {
-    Route::middleware('microservice.guest')->group(function () {
-        Route::get('login', 'BlogAuthController@login')->name('login');
-        Route::post('login', 'BlogAuthController@postLogin')->name('post.login');
+    Route::namespace('App\Http\Controllers')->group(function () {
 
-        Route::get('registration', 'BlogAuthController@registration')->name('registration');
-        Route::post('registration', 'BlogAuthController@postRegistration')->name('post.postRegistration');
+        Route::resource('blogs', 'Blog\BlogController');
+
+        Route::middleware('microservice.auth')->group(function () {
+            Route::get('profile', 'Profile\ProfileController@index')->name('profile.index');
+            Route::resource('categories', 'Blog\CategoryController');
+            Route::resource('tags', 'Blog\TagController');
+        });
+    });
+
+    Route::namespace('App\Http\Controllers\Auth')->group(function () {
+        Route::middleware('microservice.guest')->group(function () {
+            Route::get('login', 'BlogAuthController@login')->name('login');
+            Route::post('login', 'BlogAuthController@postLogin')->name('post.login');
+            Route::get('registration', 'BlogAuthController@registration')->name('registration');
+            Route::post('registration', 'BlogAuthController@postRegistration')->name('post.postRegistration');
+        });
+
+        Route::middleware('microservice.auth')->group(function () {
+            Route::get('logout', 'BlogAuthController@logout')->name('logout');
+        });
     });
 
 
 });
+
+
+
