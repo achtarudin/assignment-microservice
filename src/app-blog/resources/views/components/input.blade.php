@@ -11,9 +11,17 @@
     <input
         class="form-control form-control"
         type="{{$type}}"
-        {{$id ? 'id=' . $id : ''}}
-        {{$placeholder ? 'placeholder=' . $placeholder : ''}}
-        {{$name ? 'name=' . $name : ''}}
-        {{$value ? 'value=' . $value : ''}}
+        @if ($id)
+            id="{{$id}}"
+        @endif
+        @if ($name)
+            name="{{$name}}"
+        @endif
+        @if ($placeholder)
+            placeholder="{{$placeholder}}"
+        @endif
+        @if ($value)
+            value="{{$value}}"
+        @endif
         aria-label=".form-control-lg {{$id}}">
 </div>

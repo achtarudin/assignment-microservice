@@ -4,7 +4,7 @@ namespace App\Services\Auth;
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\User;
+use App\Models\UserJwtModel;
 use App\Services\ServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +16,7 @@ class AuthService implements ServiceInterface
 {
     protected $user;
 
-    public function __construct(User $user)
+    public function __construct(UserJwtModel $user)
     {
         $this->user = $user;
     }

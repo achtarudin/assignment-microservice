@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use App\Exceptions\Blog\MicroserviceException;
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -45,6 +47,17 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (Exception $e, $request) {
+
+            // microservice exception
+            if ($e instanceof MicroserviceException) {
+                return response()->json([
+                    'message'   => $e->getMessage(),
+                    'code'       => $e->getCode()
+                ], $e->getCode());
+            }
         });
     }
 }

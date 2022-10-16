@@ -20,7 +20,7 @@
 
         @includeWhen(!$errors->isEmpty(), 'components.alert-error')
 
-        <form action="{{ $actionUrl }}" method="post">
+        <form action="{{ $actionUrl }}" method="post" autocomplete="off">
             @isset($result)
                 @method('PUT')
             @endisset

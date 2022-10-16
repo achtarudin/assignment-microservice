@@ -2,9 +2,17 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Exception;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\UserJwtModel;
 use Illuminate\Http\Request;
 use App\Services\Auth\AuthService;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthController extends Controller
 {
@@ -18,7 +26,43 @@ class AuthController extends Controller
 
     function login(Request $request)
     {
-        return 'login';
+        /**
+         * validate login request
+         */
+        $credentials = $this->validate($request, [
+            'email'     => 'required|email|exists:users,email',
+            'password'  => 'required'
+        ]);
+
+        /**
+         * check user by email
+         */
+        $user = $this->authService->findRecordBy(['email' => $credentials['email']])->first();
+
+        throw_if(!$user, new HttpException(404, 'User Email Not Found'));
+
+        /**
+         * check user have valid password
+         */
+        $isValidPassword = Hash::check($credentials['password'], $user->password);
+
+        throw_if(!$isValidPassword, new HttpException(404, 'User Email Not Found'));
+
+        /**
+         * generate token to user
+         */
+        $token = JWTAuth::fromUser($user);
+
+        throw_if(!$token, new HttpException(500, "Failed Generate Token Email {$credentials['email']}"));
+
+        return response()->json([
+            'access_token'  => $token,
+            'token_type'    => 'Bearer',
+            'expires_in'    =>  Carbon::now()->timestamp + config('jwt.ttl') * 60,
+            'ttl'           =>  config('jwt.ttl'),
+        ], 200, [
+            'Content-Type' => 'application/json',
+        ]);
     }
 
     function registration(Request $request)
@@ -36,6 +80,18 @@ class AuthController extends Controller
 
     function logout()
     {
-        return "logout";
+        return response()->json(['logout'], 200);
+    }
+
+    function tokenCheck()
+    {
+        try {
+            $getToken   = JWTAuth::getToken();
+            $apy        = JWTAuth::getPayload($getToken)->toArray();
+            return response()->json(true, 200);
+
+        } catch (Exception $e) {
+            throw($e);
+        }
     }
 }
