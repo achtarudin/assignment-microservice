@@ -14,7 +14,7 @@
 */
 
 $router->get('/', function () use ($router) {
-    return "{$router->app->version()} FUCK";
+    return "{$router->app->version()}";
 });
 
 $router->post('/login', 'Auth\AuthController@login');
