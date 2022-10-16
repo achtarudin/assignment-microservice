@@ -1,12 +1,11 @@
 @extends('layouts.app')
 @php
-$title = Route::is('blogs.create') ? 'Create a new blog' : 'Edit  a blog';
-$actionUrl = Route::is('blogs.create') ? route('blogs.store') : route('blogs.update', $result->id);
+    $title = Route::is('blogs.create') ? 'Create a new blog' : 'Edit a blog';
+    $actionUrl = Route::is('blogs.create') ? route('blogs.store') : route('blogs.update', $result->id);
 
-$valueTitle = old('title') ? old('title') : (isset($result->title) ? $result->title : '');
-$valueContent = old('content') ? old('content') : (isset($result->content) ? $result->content : '');
-$btnName = Route::is('blogs.create') ? 'Create' : 'Update';
-
+    $valueTitle = old('title') ? old('title') : (isset($result->title) && $errors->isEmpty()? $result->title : '');
+    $valueContent = old('content') ? old('content') : (isset($result->content) && $errors->isEmpty() ? $result->content : '');
+    $btnName = Route::is('blogs.create') ? 'Create' : 'Update';
 @endphp
 @section('contents')
     <div class="p-2">
@@ -19,29 +18,31 @@ $btnName = Route::is('blogs.create') ? 'Create' : 'Update';
             </div>
         </div>
 
+        @includeWhen(!$errors->isEmpty(), 'components.alert-error')
+
         <form action="{{ $actionUrl }}" method="post">
             @isset($result)
                 @method('PUT')
             @endisset
             @csrf
-            <div class="d-flex justify-content-between mb-4">
-                <div>
-                    {{ $errors }}
-                    {{ old('tags.0') }}
-                </div>
+            <div class="d-flex justify-content-end mb-4">
                 <button type="submit" class="btn btn-lg btn-info">{{$btnName}}</button>
             </div>
             <div class="row">
                 <div class="col-md-8">
-                    <div class="mb-2">
-                        <label for="title" class="form-label text-info">Title</label>
-                        <input class="form-control form-control" type="text" id="title" placeholder="Blog Title"
-                            name="title" value="{{ $valueTitle }}" aria-label=".form-control-lg example">
-                    </div>
+                    @includeWhen(true, 'components.input', [
+                        'label'         => 'Title',
+                        'id'            => 'title',
+                        'name'          => 'title',
+                        'placeholder'   => 'Title',
+                        'value'         => old('title')
+                            ? old('title')
+                            : (isset($result->title) && $errors->isEmpty() ? $result->title : '')
+                    ])
 
                     <div class="mb-2">
                         <label for="content" class="form-label text-info">Contents</label>
-                        <textarea class="form-control" id="content" rows="10" name="content">{{ $valueContent }}</textarea>
+                        <textarea class="form-control" rows="10" id="content"  name="content">{{ $valueContent }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-4">

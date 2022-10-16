@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.app', ['title' => isset($result->title) ? "{$result->title} | Blog" : null])
 @section('contents')
     <div>
+        {{-- Title --}}
         <div>
             <div class="d-flex justify-content-start mb-2">
                 <div class="me-3">
@@ -15,6 +16,7 @@
             </div>
         </div>
 
+        {{-- Content --}}
         <div class="card border-0 shadow-sm p-3">
             <p>{{ $result->content }}</p>
 
@@ -46,7 +48,5 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 @endsection
