@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('blogs.index');
+    return response()->json([
+        'available_homes' => ['/blogs']
+    ]);
 });
 
 Route::middleware('microservice')->group(function () {
@@ -42,9 +44,4 @@ Route::middleware('microservice')->group(function () {
             Route::get('logout', 'BlogAuthController@logout')->name('logout');
         });
     });
-
-
 });
-
-
-
